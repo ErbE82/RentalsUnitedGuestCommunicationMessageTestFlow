@@ -1,0 +1,629 @@
+{
+	"info": {
+		"_postman_id": "ec5bf00b-4973-417a-a046-33749c22e303",
+		"name": "RU GC Message flow",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "21300247",
+		"_collection_link": "https://solar-crescent-76211.postman.co/workspace/Team-Workspace~6bbf410a-3304-4327-87e3-5157873a825b/collection/21300247-ec5bf00b-4973-417a-a046-33749c22e303?action=share&source=collection_link&creator=21300247"
+	},
+	"item": [
+		{
+			"name": "Create a thread in the booking",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"const json = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Communication channel name should be equal 'Email'\", function () {\r",
+							"    pm.expect(json.CommunicationChannel).to.eql(\"Email\");\r",
+							"});\r",
+							"\r",
+							"const reservationID = pm.collectionVariables.get('cReservationID');\r",
+							"\r",
+							"pm.test(\"Parent ID should be equal: \" + reservationID, function () {\r",
+							"    pm.expect(json.ParentID).to.eql(parseInt(reservationID));\r",
+							"});\r",
+							"\r",
+							"pm.collectionVariables.set('cThreadID', json.ID);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "{{username}}",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "{{backdoor}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"ParentType\": \"RUReservation\",\r\n  \"ParentID\": \"{{cReservationID}}\",\r\n  \"FirstName\": \"{{cFirstName}}\",\r\n  \"LastName\": \"{{cLastName}}\",\r\n  \"EmailAddress\": \"{{cEmailAddress}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{gcUrl}}messaging/threads",
+					"host": [
+						"{{gcUrl}}messaging"
+					],
+					"path": [
+						"threads"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all threads associated with a given reservation ID Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"const json = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Test data type of the response should be an array\", function () {\r",
+							"pm.expect(json).to.be.an('array');\r",
+							"});\r",
+							"\r",
+							"const numberOfElements = json.length;\r",
+							"const threadID = pm.collectionVariables.get('cThreadID');\r",
+							"\r",
+							"pm.test(\"The last thread ID should be equal: \" + threadID, function () {\r",
+							"pm.expect(json[numberOfElements - 1].ID).to.be.eql(threadID);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "{{username}}",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "{{backdoor}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{gcUrl}}messaging/threads?parentType=RUReservation&parentId={{cReservationID}}",
+					"host": [
+						"{{gcUrl}}messaging"
+					],
+					"path": [
+						"threads"
+					],
+					"query": [
+						{
+							"key": "parentType",
+							"value": "RUReservation"
+						},
+						{
+							"key": "parentId",
+							"value": "{{cReservationID}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get user thread by ID Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"const json = pm.response.json();\r",
+							"\r",
+							"const threadID = pm.collectionVariables.get('cThreadID');\r",
+							"\r",
+							"pm.test(\"Thread ID should be equal: \" + threadID, function () {\r",
+							"pm.expect(json.ID).to.be.eql(threadID);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Communication channel name should be 'Email'\", function () {\r",
+							"    pm.expect(json.CommunicationChannel).to.eql(\"Email\");\r",
+							"});\r",
+							"\r",
+							"const reservationID = pm.collectionVariables.get('cReservationID');\r",
+							"\r",
+							"pm.test(\"Parent ID should be equal: \" + reservationID, function () {\r",
+							"    pm.expect(json.ParentID).to.eql(parseInt(reservationID));\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "{{username}}",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "{{backdoor}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-Airbnb-API-Key",
+						"value": "aq7c15z1y3rtifqaaitqyxflf",
+						"type": "text"
+					},
+					{
+						"key": "X-Airbnb-OAuth-Token",
+						"value": "8mpd24kbej7b14dt1lq0fx3mz",
+						"type": "text"
+					},
+					{
+						"key": "X-Airbnb-Req-Api-Version",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"url": {
+					"raw": "{{gcUrl}}messaging/threads/{{cThreadID}}",
+					"host": [
+						"{{gcUrl}}messaging"
+					],
+					"path": [
+						"threads",
+						"{{cThreadID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Send a message in the given threadID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"const json = pm.response.json();\r",
+							"\r",
+							"const threadID = pm.collectionVariables.get('cThreadID');\r",
+							"\r",
+							"pm.test(\"Thread ID should be: \" + threadID, function () {\r",
+							"    pm.expect(json.ThreadID).to.eql(threadID);\r",
+							"});\r",
+							"\r",
+							"const message = pm.collectionVariables.get('cMessageBody');\r",
+							"\r",
+							"pm.test(\"Message should be: \" + message, function () {\r",
+							"    pm.expect(json.Body).to.eql(message);\r",
+							"});\r",
+							"\r",
+							"pm.collectionVariables.set('cMessageID', json.ID);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "{{username}}",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "{{backdoor}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Body\": \"{{cMessageBody}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{gcUrl}}messaging/threads/{{cThreadID}}/messages",
+					"host": [
+						"{{gcUrl}}messaging"
+					],
+					"path": [
+						"threads",
+						"{{cThreadID}}",
+						"messages"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Lists all messages under a given thread Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"const json = pm.response.json();\r",
+							"\r",
+							"const threadID = pm.collectionVariables.get('cThreadID');\r",
+							"\r",
+							"pm.test(\"Thread ID should be: \" + threadID, function () {\r",
+							"    pm.expect(json[0].ThreadID).to.eql(threadID);\r",
+							"});\r",
+							"\r",
+							"const message = pm.collectionVariables.get('cMessageBody');\r",
+							"\r",
+							"pm.test(\"Message should be: \" + message, function () {\r",
+							"    pm.expect(json[0].Body).to.eql(message);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "{{username}}",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "{{backdoor}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-Airbnb-API-Key",
+						"value": "aq7c15z1y3rtifqaaitqyxflf",
+						"type": "text"
+					},
+					{
+						"key": "X-Airbnb-OAuth-Token",
+						"value": "8mpd24kbej7b14dt1lq0fx3mz",
+						"type": "text"
+					},
+					{
+						"key": "X-Airbnb-Req-Api-Version",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"url": {
+					"raw": "{{gcUrl}}messaging/threads/{{cThreadID}}/messages?messageLimit=10",
+					"host": [
+						"{{gcUrl}}messaging"
+					],
+					"path": [
+						"threads",
+						"{{cThreadID}}",
+						"messages"
+					],
+					"query": [
+						{
+							"key": "messageLimit",
+							"value": "10"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Gets the message by its ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"const json = pm.response.json();\r",
+							"\r",
+							"const threadID = pm.collectionVariables.get('cThreadID');\r",
+							"\r",
+							"pm.test(\"Thread ID should be: \" + threadID, function () {\r",
+							"    pm.expect(json.ThreadID).to.eql(threadID);\r",
+							"});\r",
+							"\r",
+							"const message = pm.collectionVariables.get('cMessageBody');\r",
+							"\r",
+							"pm.test(\"Message should be: \" + message, function () {\r",
+							"    pm.expect(json.Body).to.eql(message);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "{{username}}",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "{{backdoor}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-Airbnb-API-Key",
+						"value": "aq7c15z1y3rtifqaaitqyxflf",
+						"type": "text"
+					},
+					{
+						"key": "X-Airbnb-OAuth-Token",
+						"value": "8mpd24kbej7b14dt1lq0fx3mz",
+						"type": "text"
+					},
+					{
+						"key": "X-Airbnb-Req-Api-Version",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"url": {
+					"raw": "{{gcUrl}}messaging/messages/{{cMessageID}}",
+					"host": [
+						"{{gcUrl}}messaging"
+					],
+					"path": [
+						"messages",
+						"{{cMessageID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all messages associated with a given thread parent object - ReservationID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"const json = pm.response.json();\r",
+							"\r",
+							"const threadID = pm.collectionVariables.get('cThreadID');\r",
+							"\r",
+							"const arrayLength = json.length; \r",
+							"\r",
+							"pm.test(\"Thread ID should be: \" + threadID, function () {\r",
+							"    pm.expect(json[arrayLength - 1].ThreadID).to.eql(threadID);\r",
+							"});\r",
+							"\r",
+							"const message = pm.collectionVariables.get('cMessageBody');\r",
+							"\r",
+							"pm.test(\"Message should be: \" + message, function () {\r",
+							"    pm.expect(json[0].Body).to.eql(message);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "{{username}}",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "{{backdoor}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{gcUrl}}messaging/messages?parentType=RUReservation&parentId={{cReservationID}}",
+					"host": [
+						"{{gcUrl}}messaging"
+					],
+					"path": [
+						"messages"
+					],
+					"query": [
+						{
+							"key": "parentType",
+							"value": "RUReservation"
+						},
+						{
+							"key": "parentId",
+							"value": "{{cReservationID}}"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "cReservationID",
+			"value": "enter RU reservation ID",
+			"type": "string"
+		},
+		{
+			"key": "cFirstName",
+			"value": "enter guest first name",
+			"type": "string"
+		},
+		{
+			"key": "cLastName",
+			"value": "enter guest last name",
+			"type": "string"
+		},
+		{
+			"key": "cEmailAddress",
+			"value": "enter guest email address",
+			"type": "string"
+		},
+		{
+			"key": "cThreadID",
+			"value": ""
+		},
+		{
+			"key": "cMessageBody",
+			"value": "It's just a test message.",
+			"type": "string"
+		},
+		{
+			"key": "cMessageID",
+			"value": ""
+		}
+	]
+}
