@@ -1,0 +1,2 @@
+# RentalsUnitedGuestCommunicationMessageTestFlow
+Postman test collection
